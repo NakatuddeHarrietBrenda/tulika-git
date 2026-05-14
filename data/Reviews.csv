@@ -1,0 +1,16 @@
+review_id,customer_id,package_id,rating,comment,review_date
+R001,C001,P001,5,Amazing Medical trip to Lira,5/17/2025
+R002,C002,P002,4,Experiences of a lifetime,11/2/2025
+R003,C003,P003,5,Amazing tour guide with Arnold Tulikka,11/16/2024
+R004,C004,P004,4,Thank you to Tullkka Tours,11/17/2024
+R005,C005,P005,5,"Work and play with a totally honest, good man.",11/18/2024
+R006,C006,P006,5,Simply the best,11/19/2024
+R007,C007,P007,5,Arnold is the best!,11/19/2024
+R008,C008,P008,5,"What an amazing experience: fun , exhilarating and safe.",10/11/2025
+R009,C009,P009,5,Excellent drivers/guides for our Uganda trip.,11/28/2025
+R010,C010,P010,4,Arnold is Awesome!,11/10/2025
+R011,C011,P011,5,Group travelling on a volunteering trip,11/2/2025
+R012,C012,P012,5,Arnold is fantastic!,10/25/2025
+R013,C013,P013,5,The best guide in Uganda!,10/6/2025
+R014,C014,P014,4,A fun trip with a great tour guide!,5/17/2025
+R015,C015,P015,5,Amazing experience,1/19/2025

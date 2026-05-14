@@ -1,0 +1,32 @@
+package_id,Country,City,package_category,destination,Price,Price-Tier,Popularity,BestTimeToVisit
+P001,Uganda,Kasese,Wildlife Safari,Queen Elizabeth NP,4050,Medium,9,"June-Aug, Dec-Feb"
+P002,Uganda,Junja,Group Tour,Jinja,4050,Medium,8.5,"June-sept, Jam-Feb"
+P003,Uganda,Kampala,Cultural Tour,Buganda Kingdom,3350,Budget,9.2,All year round
+P004,Uganda,Masindi,Luxury Safari,Murchison Falls,6500,Luxury,9.3,"Dec-Feb, June-Sept"
+P005,Uganda,kaabong,Camping Safari,Kidepo Valley,4050,Medium,8.4,Sept-March
+P006,Uganda,Kabale,Family Tour,Lake Bunyonyi,3350,Budget,7.6,"June-August, Dec-Feb"
+P007,Tanzania,Zanzibar,Luxury fanily tour,Zanzibar,6500,Luxury,9.1,"Dec-Feb, June-Aug"
+P008,Uganda,Kanungu,Group Tour,Bwindi,4050,Medium,9.5,"June-Aug, Dec-Feb"
+P009,kenya,Ukunda,Beach Holiday,Diani Beach,6500,Luxury,9.3,Dec-March
+P010,Uganda,Kampala,City Tour,Kampala,3350,Budget,8.8,"Dec-Feb, June-Aug"
+P011,Uganda,Entebbe,Wildlife Safari,Entebbe Wildlife Education center,4050,Medium,8.2,Nov-Feb
+P012,Uganda,Kampala,Family Tour,Uganda museum,3350,Budget,8.1,Nov-Mar
+P013,Uganda,Entebbe,Nature and sanctuary,Ngaba Island Chimp Sanctuary,4050,Medium,9.1,"June-Aug, Dec-Feb"
+P014,Uganda,Jinja,Cultural Tour,Nile,3350,Budget,8.6,Sep-Mar
+P015,kenya,Loitokitok,Family Tour,Amboseli NP,4050,Medium,9.3,June-Oct
+P016,kenya,Nakuru,Boat trip Adventure,Lake Nakuru,4050,Medium,8.2,July-Dec
+P017,kenya,Naivasha,Boat trip(group),Lake naivasha,4050,Medium,8.2,June-Oct
+P018,Uganda,Entebbe,Family Tour,Lake victoria,3350,Budget,8.3,Oct-Mar
+P019,Uganda,Kisoro,Mufumbiro Escape,Mt Mufumbiro,4050,Medium,9,Sep-Mar
+P020,Uganda,Mbale,guided hiking trips,Mt Elgon,4050,Medium,8.9,Apr-Jun
+P021,Uganda,Kasese,Mountain climbing,Mt rwenzori,4050,Medium,9.3,"June-Aug, Dec-Feb"
+P022,Uganda,Kanungu,Gorilla trekking,Bwindi Impenetrable forests,6500,Luxury,7.7,Nov-Mar
+P023,Uganda,Lugazi,Uganda wildlife safari adventure,Mabiira forest,3350,Budget,7.9,"Jan-Feb, July-Aug"
+P026,Tanzania,Arusha,Camping Safari,Upper mid range,4050,Medium,9.1,Nov-Feb
+P027,Tanzania,Karatu,Day Safaris game drives,Ngorongoro Crater,6500,Luxury,9.9,June-Oct
+P028,Tanzania,Arusha,Airport pick ups,Tarangire,4050,Medium,8.5,Oct-Mar
+P029,Uganda,,Business trip,"King Fisher, Tilenga",4050,Medium,8.3,Sep-Mar
+P033,Uganda,Fort portal,Primate Trekking,Kibale Forest NP,6500,Luxury,9.5,"June-Sept, Dec-Feb"
+P034,Uganda,Kapichorwa,Hiking and Coffee,Sipi falls,4050,Medium,8.8,All year round but June-Aug is best
+P035,Tanzania,Arusha,Wildlife Safari,Serengiti NP,6500,Luxury,9.9,June-Oct
+P036,Uganda,Kalangala,Wellness Retreat,"Kalangala(Sese Islands, victoria)",3350,Budget,7.5,Dec-Feb

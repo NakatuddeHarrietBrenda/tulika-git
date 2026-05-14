@@ -1,0 +1,29 @@
+customer_id,name,gender,email,Age,number_of_adults,number_of_children,travel_preference,package type
+C001,Asimmwe Mary,Male,asimmwemary@email.com,20,2,0,Queen Elizabeth NP,Luxury
+C002,Rhitivik Victoria,Female,vicky@email.com,21,1,0,Buganda Kingdom,Medium
+C003,Judymella,Male,judymella2@gmail.com,23,1,2,Camping Safari,Ludget
+C004,David Mazemulo,Male,david@gmail.com,25,1,0,Queen Elizabeth NP,Luxury
+C005,Abdul Samad,Male,abdulsam@gmail.com,32,2,1,"Jinja, lake Bunyonyi",Medium
+C006,Sadia Mirza,Female,mizrasadia@gmail.com,37,2,2,Buganda Kingdom,Budget
+C007,Arun Asfa,Female,asfa@gmail.com,38,2,0,Murchison Falls,Luxury
+C008,Amara Mubeen,Female,mubeennamara@gmail.com,36,2,2,Kidepo Valley,Luxury
+C009,Namara Aisha,Female,aisha@gmail.com,24,1,0,Lake Bunyonyi,Medium
+C010,Sarah Achieng,Female,sarah@gmail.com,40,1,1,Zanzibar,Budget
+C011,Okello Joshoua,Male,okellojoe@gmail.com,38,1,2,Bwindi,Luxury
+C012,Tanvi Kaya,Female,tanvi@gmail.com,20,2,2,Diani Beach,Medium
+C013,Karan Kunene,Male,karan@gmail.com,19,7,2,Lake Bunyonyi,Budget
+C014,Rohan Jonzak,Male,rohan@gmail.com,36,3,2,Entebbe Wildlife Education center,Luxury
+C015,Vivaan Rachol,Female,vivi@gmail.com,18,1,2,Uganda museum,Luxury
+C016,Riya Rashan,Female,riya@gmail.com,20,1,0,Ngaba Island Chimp Sanctuary,Medium
+C017,Rohan marscha,Male,marscha@gmail.com,22,1,2,Nile,Ludget
+C018,Vivaana Rhinah,Male,viviana@gmail.com,39,2,0,Amboseli,Luxury
+C019,Anika Taya,Female,anika@gmail.com,30,1,0,Nakuru,Medium
+C020,Dhruv jackson,Female,dhruvjackson@gmail.com,33,2,1,Tarangia,Budget
+C020,Meera Johns,Female,meerajohns@gmail.com,33,7,1,Tarangia,Luxury
+C021,Karan Mali,Female,karanmali@gmail.com,35,1,3,Ngorongoro,Luxury
+C022,Anika Shan,Female,anikashan@gmail.com,28,1,1,Lake victoria,Medium
+C023,Aanya Mitya,Male,aanya@gmail.com,27,2,0,Mt Rwenzori,Ludget
+C024,Julian shin,Female,Julian@gmail.com,27,2,2,Bwindi Impenetrable forests,Luxury
+C025,Kaya mazemelo,Male,mazemolo@gmail.com,26,2,1,Mabiira forest,Medium
+C026,Bhule Kunene,Male,kunene@gmail.com,22,2,0,Diani Beach,Budget
+C027,Mtsepo Johns,Female,john@gmail.com,20,1,1,Upper mid range,Luxury
