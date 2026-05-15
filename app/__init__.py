@@ -15,7 +15,8 @@ def create_app():
 
     CORS(app)
 
-    app.config["JWT_SECRET_KEY"] = "tulika-secret-key"
+    import os
+    app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "tulika-secret-key")
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///tulika.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 

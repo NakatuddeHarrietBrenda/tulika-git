@@ -10,7 +10,7 @@ from sklearn.metrics import silhouette_score
 
 warnings.filterwarnings('ignore')
 
-# ============ LOAD & PREPARE DATA ============
+#  LOAD & PREPARE DATA 
 print("Loading data...")
 customers = pd.read_csv("data/Customers.csv")
 packages  = pd.read_csv("data/Packages.csv")
@@ -30,7 +30,7 @@ df = df.merge(reviews,   on=["customer_id", "package_id"], how="left", suffixes=
 
 
 
-# ============ DATA PREPROCESSING ============
+#  DATA PREPROCESSING 
 if "price" in df.columns:
     df["price"] = pd.to_numeric(df["price"], errors='coerce').fillna(0)
 if "amount_paid" in df.columns:
@@ -47,7 +47,7 @@ for date_col in ["booking_date", "travel_date", "review_date", "payment_date"]:
     if date_col in df.columns:
         df[date_col] = pd.to_datetime(df[date_col], errors='coerce')
 
-# ============ CUSTOMER SEGMENTATION (K-MEANS) ============
+# CUSTOMER SEGMENTATION (K-MEANS)
 print("Training segmentation model...")
 seg_features = df[["price", "popularity"]].fillna(0)
 scaler       = StandardScaler()
@@ -63,7 +63,7 @@ try:
 except Exception:
     sil_score_val = None
 
-# ============ DEMAND FORECASTING (LINEAR REGRESSION) ============
+#  DEMAND FORECASTING (LINEAR REGRESSION) 
 print("Training demand forecast model...")
 demand_df = df[["price", "popularity", "number_of_people"]].dropna()
 lr_model   = None
@@ -76,7 +76,7 @@ if len(demand_df) >= 5:
     lr_model.fit(X_d, y_d)
     demand_r2 = float(lr_model.score(X_d, y_d))
 
-# ============ SENTIMENT ANALYSIS ============
+# SENTIMENT ANALYSIS 
 print("Training sentiment model...")
 
 def sentiment_label(rating):
@@ -102,7 +102,7 @@ else:
     classes_found = list(valid_comments["sentiment"].unique()) if len(valid_comments) > 0 else []
     print(f"WARNING: Sentiment model skipped. Classes found: {classes_found}")
 
-# ============ ML MODELS & DATA ============
+# ML MODELS & DATA 
 def get_overview_stats():
     return {
         "total_packages":  int(packages["package_id"].nunique()),
