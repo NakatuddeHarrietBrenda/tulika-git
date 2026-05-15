@@ -78,3 +78,18 @@ def model_evaluation():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@analytics_bp.route("/activity-logs")
+@jwt_required()
+def activity_logs():
+    from app.models.activity_log import ActivityLog
+    try:
+        logs = ActivityLog.query.order_by(ActivityLog.timestamp.desc()).limit(100).all()
+        return jsonify([{
+            "user": log.user_email,
+            "action": log.action,
+            "timestamp": log.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+            "ip": log.ip_address
+        } for log in logs]), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+

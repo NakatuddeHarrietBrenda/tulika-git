@@ -17,6 +17,7 @@ def create_app():
 
     import os
     app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "tulika-secret-key")
+    app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "tulika-master-secret-key")
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///tulika.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -45,13 +46,15 @@ def create_app():
 
     with app.app_context():
         from app.models.user_model import User
+        from app.models.activity_log import ActivityLog
         db.create_all()
         
         # Create default admin if no users exist
         if not User.query.first():
-            admin = User(email="admin@tulikatours.com", password="password123")
+            admin = User(email="admin@tulikatours.com")
+            admin.set_password("password123")
             db.session.add(admin)
             db.session.commit()
-            print("Default admin created: admin@tulikatours.com / password123")
+            print("Default admin created (Hashed): admin@tulikatours.com / password123")
 
     return app
