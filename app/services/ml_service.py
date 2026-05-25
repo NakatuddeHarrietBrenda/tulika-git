@@ -12,23 +12,157 @@ warnings.filterwarnings('ignore')
 
 #  LOAD & PREPARE DATA 
 print("Loading data...")
-customers = pd.read_csv("data/Customers.csv")
-packages  = pd.read_csv("data/Packages.csv")
-bookings  = pd.read_csv("data/bookings.csv")
-reviews   = pd.read_csv("data/Reviews.csv")
-payments  = pd.read_csv("data/Payments.csv")
+import os
+import joblib
 
-# Clean column names
-for df_item in [customers, packages, bookings, reviews, payments]:
-    df_item.columns = df_item.columns.str.lower().str.replace(" ", "_")
-
-# Merge all data
-df = bookings.merge(customers, on="customer_id", how="left")
-df = df.merge(packages,  on="package_id",  how="left")
-df = df.merge(payments,  on="booking_id",  how="left")
-df = df.merge(reviews,   on=["customer_id", "package_id"], how="left", suffixes=('', '_review'))
-
-
+# Check if new files exist, else fallback to old ones
+if os.path.exists("data/Final_Updated_Expanded_Users.csv"):
+    users = pd.read_csv("data/Final_Updated_Expanded_Users.csv")
+    destinations = pd.read_csv("data/Expanded_Destinations.csv")
+    reviews = pd.read_csv("data/Final_Updated_Expanded_Reviews.csv")
+    history = pd.read_csv("data/Final_Updated_Expanded_UserHistory.csv")
+    
+    # Clean column names
+    for df_item in [users, destinations, reviews, history]:
+        df_item.columns = df_item.columns.str.lower().str.replace(" ", "_")
+        
+    # Translate Indian destinations to beautiful East African equivalents
+    destination_translation = {
+        "Taj Mahal": "Murchison Falls",
+        "Goa Beaches": "Zanzibar Beaches",
+        "Jaipur City": "Kampala City",
+        "Kerala Backwaters": "Lake Bunyonyi",
+        "Leh Ladakh": "Mount Rwenzori"
+    }
+    destinations['name'] = destinations['name'].map(destination_translation).fillna(destinations['name'])
+    
+    state_translation = {
+        "Uttar Pradesh": "Masindi",
+        "Goa": "Zanzibar",
+        "Rajasthan": "Kampala",
+        "Kerala": "Kabale",
+        "Jammu & Kashmir": "Kasese"
+    }
+    destinations['state'] = destinations['state'].map(state_translation).fillna(destinations['state'])
+    
+    country_translation = {
+        "India": "East Africa"
+    }
+    
+    # Save the complete unified dataset before renaming columns
+    complete_df = history.merge(users, on="userid", how="outer")
+    complete_df = complete_df.merge(destinations, on="destinationid", how="outer", suffixes=('_user', '_dest'))
+    complete_df = complete_df.merge(reviews, on=["userid", "destinationid"], how="left", suffixes=('', '_review'))
+    complete_df.to_csv("data/Complete_Tulika_Dataset.csv", index=False)
+    print(f"Saved complete merged dataset to data/Complete_Tulika_Dataset.csv ({len(complete_df)} records)")
+        
+    # Simulate 'age' programmatically to make demographics charts work
+    import numpy as np
+    np.random.seed(42)
+    users['age'] = np.random.randint(18, 65, size=len(users))
+    
+    # Map user columns
+    customers = users.rename(columns={
+        'userid': 'customer_id',
+        'preferences': 'travel_preference',
+        'numberofadults': 'number_of_adults',
+        'numberofchildren': 'number_of_children'
+    })
+    
+    # Assign prices and price-tiers based on East African destinations
+    price_map = {
+        "Murchison Falls": 6500,
+        "Zanzibar Beaches": 6500,
+        "Kampala City": 3350,
+        "Lake Bunyonyi": 3350,
+        "Mount Rwenzori": 4050
+    }
+    tier_map = {
+        "Murchison Falls": "Luxury",
+        "Zanzibar Beaches": "Luxury",
+        "Kampala City": "Budget",
+        "Lake Bunyonyi": "Budget",
+        "Mount Rwenzori": "Medium"
+    }
+    destinations['price'] = destinations['name'].map(price_map).fillna(4050)
+    destinations['price-tier'] = destinations['name'].map(tier_map).fillna('Medium')
+    
+    # Set East African countries based on destination name
+    country_map = {
+        "Murchison Falls": "Uganda",
+        "Zanzibar Beaches": "Tanzania",
+        "Kampala City": "Uganda",
+        "Lake Bunyonyi": "Uganda",
+        "Mount Rwenzori": "Uganda"
+    }
+    destinations['country'] = destinations['name'].map(country_map).fillna('Uganda')
+    destinations['city'] = destinations['state']
+    
+    packages = destinations.rename(columns={
+        'destinationid': 'package_id',
+        'name': 'destination',
+        'type': 'package_category'
+    })
+    
+    # Map history columns
+    history['visitdate'] = pd.to_datetime(history['visitdate'])
+    history['booking_date'] = history['visitdate'] - pd.Timedelta(days=30)
+    
+    bookings = history.rename(columns={
+        'historyid': 'booking_id',
+        'userid': 'customer_id',
+        'destinationid': 'package_id',
+        'visitdate': 'travel_date'
+    })
+    bookings = bookings.merge(customers[['customer_id', 'number_of_adults', 'number_of_children']], on='customer_id', how='left')
+    bookings['number_of_people'] = bookings['number_of_adults'] + bookings['number_of_children']
+    bookings['booking_status'] = 'Confirmed'
+    
+    # Map reviews columns
+    reviews = reviews.rename(columns={
+        'reviewid': 'review_id',
+        'destinationid': 'package_id',
+        'userid': 'customer_id',
+        'rating': 'rating_review',
+        'reviewtext': 'comment'
+    })
+    
+    # Simulate payments based on bookings and prices
+    pay_merge = bookings.merge(packages[['package_id', 'price']], on='package_id', how='left')
+    methods = ['Mobile Money', 'Credit Card', 'Bank Transfer']
+    np.random.seed(42)
+    pay_methods = np.random.choice(methods, size=len(pay_merge))
+    
+    payments = pd.DataFrame({
+        'payment_id': [f"PAY{i:03d}" for i in range(len(pay_merge))],
+        'booking_id': pay_merge['booking_id'],
+        'payment_method': pay_methods,
+        'amount_paid': pay_merge['price'],
+        'payment_date': pay_merge['travel_date'] - pd.Timedelta(days=15)
+    })
+    
+    # Merge datasets
+    df = bookings.merge(customers, on="customer_id", how="left")
+    df = df.merge(packages,  on="package_id",  how="left")
+    df = df.merge(payments,  on="booking_id",  how="left")
+    df = df.merge(reviews[['customer_id', 'package_id', 'comment', 'rating_review']], on=["customer_id", "package_id"], how="left")
+    
+    df['rating'] = df['rating_review'].combine_first(df['experiencerating'])
+    df['comment'] = df['comment'].fillna("No comment")
+else:
+    customers = pd.read_csv("data/Customers.csv")
+    packages  = pd.read_csv("data/Packages.csv")
+    bookings  = pd.read_csv("data/bookings.csv")
+    reviews   = pd.read_csv("data/Reviews.csv")
+    payments  = pd.read_csv("data/Payments.csv")
+    # Clean column names
+    for df_item in [customers, packages, bookings, reviews, payments]:
+        df_item.columns = df_item.columns.str.lower().str.replace(" ", "_")
+    # Merge all data
+    df = bookings.merge(customers, on="customer_id", how="left")
+    df = df.merge(packages,  on="package_id",  how="left")
+    df = df.merge(payments,  on="booking_id",  how="left")
+    df = df.merge(reviews,   on=["customer_id", "package_id"], how="left", suffixes=('', '_review'))
 
 #  DATA PREPROCESSING 
 if "price" in df.columns:
@@ -47,60 +181,124 @@ for date_col in ["booking_date", "travel_date", "review_date", "payment_date"]:
     if date_col in df.columns:
         df[date_col] = pd.to_datetime(df[date_col], errors='coerce')
 
-# CUSTOMER SEGMENTATION (K-MEANS)
-print("Training segmentation model...")
+# Model Cache Configuration
+MODEL_DIR = "models_cache"
+os.makedirs(MODEL_DIR, exist_ok=True)
+
+kmeans_path = os.path.join(MODEL_DIR, "kmeans_model.joblib")
+scaler_path = os.path.join(MODEL_DIR, "scaler.joblib")
+lr_path = os.path.join(MODEL_DIR, "lr_model.joblib")
+sentiment_path = os.path.join(MODEL_DIR, "sentiment_model.joblib")
+tfidf_path = os.path.join(MODEL_DIR, "tfidf.joblib")
+metrics_path = os.path.join(MODEL_DIR, "metrics.joblib")
+
+segment_names = { 0: "Budget Travelers", 1: "Medium Clients", 2: "Luxury Clients" }
 seg_features = df[["price", "popularity"]].fillna(0)
-scaler       = StandardScaler()
-seg_scaled   = scaler.fit_transform(seg_features)
 
-kmeans = KMeans(n_clusters=3, random_state=42, n_init=10)
-df["segment"] = kmeans.fit_predict(seg_scaled)
+# Check if cached models exist
+models_loaded = False
+if (os.path.exists(kmeans_path) and os.path.exists(scaler_path) and 
+    os.path.exists(lr_path) and os.path.exists(sentiment_path) and 
+    os.path.exists(tfidf_path) and os.path.exists(metrics_path)):
+  try:
+    print("Loading saved ML models from cache...")
+    kmeans = joblib.load(kmeans_path)
+    scaler = joblib.load(scaler_path)
+    lr_model = joblib.load(lr_path)
+    sentiment_model = joblib.load(sentiment_path)
+    tfidf_model = joblib.load(tfidf_path)
+    
+    metrics = joblib.load(metrics_path)
+    sil_score_val = metrics.get("sil_score_val")
+    demand_r2 = metrics.get("demand_r2")
+    
+    # Segment predictions
+    df["segment"] = kmeans.predict(scaler.transform(seg_features))
+    
+    # Sort cluster IDs dynamically by mean price
+    if len(df) > 0:
+      cluster_mean_prices = df.groupby('segment')['price'].mean()
+      sorted_clusters = cluster_mean_prices.sort_values().index
+      cluster_mapping = {old_id: new_id for new_id, old_id in enumerate(sorted_clusters)}
+      df['segment'] = df['segment'].map(cluster_mapping)
+      
+    models_loaded = True
+    print("Models loaded successfully!")
+  except Exception as e:
+    print(f"Error loading cached models, retraining: {e}")
 
-segment_names = {0: "Budget Travelers", 1: "Luxury Clients", 2: "Frequent Travelers"}
+# Sentiment label helper
+def sentiment_label(rating):
+  if pd.isna(rating): return "Neutral"
+  if float(rating) >= 4: return "Positive"
+  if float(rating) == 3: return "Neutral"
+  return "Negative"
 
-try:
+df["sentiment"] = df["rating"].apply(sentiment_label)
+valid_comments = df[df["comment"].str.strip() != ""]
+
+if not models_loaded:
+  print("Training and caching ML models...")
+  # CUSTOMER SEGMENTATION (K-MEANS)
+  scaler = StandardScaler()
+  seg_scaled = scaler.fit_transform(seg_features)
+  kmeans = KMeans(n_clusters=3, random_state=42, n_init=10)
+  df["segment"] = kmeans.fit_predict(seg_scaled)
+  
+  # Sort cluster IDs dynamically by mean price to guarantee 0=Budget, 1=Medium, 2=Luxury
+  if len(df) > 0:
+    cluster_mean_prices = df.groupby('segment')['price'].mean()
+    sorted_clusters = cluster_mean_prices.sort_values().index
+    cluster_mapping = {old_id: new_id for new_id, old_id in enumerate(sorted_clusters)}
+    df['segment'] = df['segment'].map(cluster_mapping)
+  
+  try:
     sil_score_val = float(silhouette_score(seg_scaled, df["segment"]))
-except Exception:
+  except Exception:
     sil_score_val = None
 
-#  DEMAND FORECASTING (LINEAR REGRESSION) 
-print("Training demand forecast model...")
-demand_df = df[["price", "popularity", "number_of_people"]].dropna()
-lr_model   = None
-demand_r2  = None
-
-if len(demand_df) >= 5:
+  # DEMAND FORECASTING (LINEAR REGRESSION)
+  demand_df = df[["price", "popularity", "number_of_people"]].dropna()
+  lr_model = None
+  demand_r2 = None
+  if len(demand_df) >= 5:
     X_d = demand_df[["price", "popularity"]].values
     y_d = demand_df["number_of_people"].values
-    lr_model  = LinearRegression()
+    lr_model = LinearRegression()
     lr_model.fit(X_d, y_d)
     demand_r2 = float(lr_model.score(X_d, y_d))
 
-# SENTIMENT ANALYSIS 
-print("Training sentiment model...")
-
-def sentiment_label(rating):
-    if pd.isna(rating): return "Neutral"
-    if float(rating) >= 4: return "Positive"
-    if float(rating) == 3: return "Neutral"
-    return "Negative"
-
-df["sentiment"] = df["rating"].apply(sentiment_label)
-
-tfidf           = TfidfVectorizer(max_features=100, stop_words="english")
-sentiment_model = None
-tfidf_model     = None
-
-valid_comments = df[df["comment"].str.strip() != ""]
-if len(valid_comments) > 0 and valid_comments["sentiment"].nunique() >= 2:
+  # SENTIMENT ANALYSIS (LOGISTIC REGRESSION + TF-IDF)
+  tfidf = TfidfVectorizer(max_features=100, stop_words="english")
+  sentiment_model = None
+  tfidf_model = None
+  
+  if len(valid_comments) > 0 and valid_comments["sentiment"].nunique() >= 2:
     X_s = tfidf.fit_transform(valid_comments["comment"])
     y_s = valid_comments["sentiment"]
     sentiment_model = LogisticRegression(max_iter=1000, random_state=42)
     sentiment_model.fit(X_s, y_s)
     tfidf_model = tfidf
-else:
+  else:
     classes_found = list(valid_comments["sentiment"].unique()) if len(valid_comments) > 0 else []
-    print(f"WARNING: Sentiment model skipped. Classes found: {classes_found}")
+    print(f"WARNING: Sentiment model training skipped. Classes found: {classes_found}")
+
+  # Cache models to disk
+  try:
+    joblib.dump(kmeans, kmeans_path)
+    joblib.dump(scaler, scaler_path)
+    if lr_model:
+      joblib.dump(lr_model, lr_path)
+    if sentiment_model:
+      joblib.dump(sentiment_model, sentiment_path)
+    if tfidf_model:
+      joblib.dump(tfidf_model, tfidf_path)
+        
+    metrics = {"sil_score_val": sil_score_val, "demand_r2": demand_r2}
+    joblib.dump(metrics, metrics_path)
+    print("Models successfully saved to disk!")
+  except Exception as e:
+    print(f"Error saving models: {e}")
 
 # ML MODELS & DATA 
 def get_overview_stats():
@@ -225,7 +423,7 @@ def get_model_evaluation():
             "inertia":           float(kmeans.inertia_),
             "silhouette_score":  sil_score_val,
             "n_clusters":        3,
-            "n_samples":         int(len(seg_scaled)),
+            "n_samples":         int(len(seg_features)),
             "segments":          list(segment_names.values())
         },
         "demand_forecast": {
