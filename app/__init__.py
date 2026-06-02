@@ -18,7 +18,7 @@ def create_app():
     import os
     app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "tulika-secret-key")
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "tulika-master-secret-key")
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///tulika.db"
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///tulika.db")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     # Email Configuration
