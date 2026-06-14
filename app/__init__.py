@@ -4,6 +4,7 @@ from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_mail import Mail
+import os
 
 db = SQLAlchemy()
 jwt = JWTManager()
@@ -15,14 +16,36 @@ def create_app():
 
     CORS(app)
 
-    import os
-    app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "tulika-secret-key")
-    app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "tulika-master-secret-key")
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///tulika.db")
+    app.config["JWT_SECRET_KEY"] = os.environ.get(
+        "JWT_SECRET_KEY",
+        "tulika-secret-key"
+    )
+
+    app.config["SECRET_KEY"] = os.environ.get(
+        "SECRET_KEY",
+        "tulika-master-secret-key"
+    )
+
+    # Database Configuration
+    database_url = os.environ.get("DATABASE_URL")
+
+    if database_url:
+        if database_url.startswith("postgres://"):
+            database_url = database_url.replace(
+                "postgres://",
+                "postgresql://",
+                1
+            )
+
+        app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+    else:
+        app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///tulika.db"
+
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+    print("DATABASE_URL:", app.config["SQLALCHEMY_DATABASE_URI"])
+
     # Email Configuration
-    import os
     app.config['MAIL_SERVER'] = 'smtp.gmail.com'
     app.config['MAIL_PORT'] = 587
     app.config['MAIL_USE_TLS'] = True
@@ -47,14 +70,14 @@ def create_app():
     with app.app_context():
         from app.models.user_model import User
         from app.models.activity_log import ActivityLog
+
         db.create_all()
-        
-        # Create default admin if no users exist
+
         if not User.query.first():
             admin = User(email="admin@tulikatours.com")
             admin.set_password("password123")
             db.session.add(admin)
             db.session.commit()
-            print("Default admin created (Hashed): admin@tulikatours.com / password123")
+            print("Default admin created")
 
     return app
