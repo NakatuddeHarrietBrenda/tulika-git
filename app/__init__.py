@@ -26,19 +26,21 @@ def create_app():
         "tulika-master-secret-key"
     )
 
-    # Database Configuration
+    # 1. Fetch Database Configuration from Environment
     database_url = os.environ.get("DATABASE_URL")
 
     if database_url:
+        # Render PostgreSQL strings start with 'postgres://', 
+        # SQLAlchemy 1.4+ strictly requires 'postgresql://'
         if database_url.startswith("postgres://"):
             database_url = database_url.replace(
                 "postgres://",
                 "postgresql://",
                 1
             )
-
         app.config["SQLALCHEMY_DATABASE_URI"] = database_url
     else:
+        # Local development fallback
         app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///tulika.db"
 
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -53,6 +55,7 @@ def create_app():
     app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
     app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
 
+    # Initialize extensions
     db.init_app(app)
     jwt.init_app(app)
     migrate.init_app(app, db)
@@ -67,10 +70,12 @@ def create_app():
     app.register_blueprint(analytics_bp)
     app.register_blueprint(recommendation_bp)
 
+    # Create Tables and Database Initialization
     with app.app_context():
         from app.models.user_model import User
         from app.models.activity_log import ActivityLog
 
+        # This will automatically build your tables inside PostgreSQL!
         db.create_all()
 
         if not User.query.first():
